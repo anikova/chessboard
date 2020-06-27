@@ -1,75 +1,48 @@
-import React, { useState, useMemo } from 'react';
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DragStart
-} from 'react-beautiful-dnd';
+import React, { useState } from 'react';
 
-import { Box, ItemWrapper, Header, ItemsWrapper } from './StyledComponents';
-import { getStyle } from '../utils/getStyle';
+import { ItemsWrapper } from './StyledComponents';
+import { ChessItem } from './ChessItem';
+import { getValue, getType } from '../utils/getStyle';
+import { ChessBoardProps, DragEndEvent } from '../types';
 
-interface Props {
-  isDisabled: boolean;
-}
-
-const ChessBoard = ({ isDisabled }: Props) => {
-  const [items, setItems] = useState(
-    Array.from(
-      {
-        length: 64
-      },
-      (x, i) => ({ value: i, type: i % 2 === 0 })
-    )
+const getChessItems = () => {
+  return Array.from(
+    {
+      length: 64
+    },
+    (item, index) => ({ value: getValue(index), type: getType(index), index })
   );
+};
 
-  const onDragEnd = (e: any) => {
-    // const destIndex = e.destination.index;
-    // const sourceIndex = e.source.index;
-    // const destValue = items[destIndex].value;
-    // const sourceValue = items[sourceIndex].value;
-    // items[destIndex].value = sourceValue;
-    // items[sourceIndex].value = destValue;
-    // //  setItems([...items]);
+const ChessBoard = ({ isDisabled }: ChessBoardProps) => {
+  const [items, setItems] = useState(getChessItems());
+
+  const onDragEnd = ({ source, target }: DragEndEvent) => {
+    const { value: destValue, type: destType } = items[target];
+    const { value: sourceValue, type: sourceType } = items[source];
+
+    items[target] = { ...items[target], value: sourceValue, type: sourceType };
+    items[source] = { ...items[source], value: destValue, type: destType };
+
+    setItems([...items]);
   };
 
-  const renderItems = useMemo(() => {
-    return items.map((x, index) => {
-      const { color, backgroundColor } = getStyle(index);
-      return (
-        <Box backgroundColor={backgroundColor} color={color} key={index}>
-          <Draggable draggableId={index.toString()} index={index} key={index}>
-            {(provided, snapshot) => {
-              return (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.draggableProps}
-                  {...provided.dragHandleProps}
-                >
-                  <ItemWrapper>{x.value}</ItemWrapper>
-                </div>
-              );
-            }}
-          </Draggable>
-        </Box>
-      );
-    });
-  }, []);
-
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="droppable">
-        {provided => (
-          <>
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-              <Header>ChessBoard</Header>
-              <ItemsWrapper>{renderItems}</ItemsWrapper>
-            </div>
-            {provided.placeholder}
-          </>
-        )}
-      </Droppable>
-    </DragDropContext>
+    <>
+      <ItemsWrapper>
+        {items.map(item => {
+          return (
+            <ChessItem
+              name={item.index.toString()}
+              item={item}
+              dragEnd={onDragEnd}
+              isDisabled={isDisabled}
+              key={item.index}
+            />
+          );
+        })}
+      </ItemsWrapper>
+    </>
   );
 };
 

@@ -1,17 +1,25 @@
 import React, { useState } from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
 import './App.css';
 import ChessBoard from './components/ChessBoard';
-import Button from './components/Button';
+import EditModeButton from './components/EditModeButton';
 import { Wrapper } from './components/StyledComponents';
+import HeaderWrapper from './components/HeaderWrapper';
 
 const App = () => {
-  const [isDisabled, setIsDisabled] = useState(true);
+  const [mode, setMode] = useState(false);
 
   return (
-    <Wrapper>
-      <ChessBoard isDisabled={isDisabled} />
-      <Button modeChanged={mode => setIsDisabled(mode)} />
-    </Wrapper>
+    <DndProvider backend={HTML5Backend}>
+      <HeaderWrapper />
+
+      <Wrapper className="wrapper">
+        <ChessBoard isDisabled={!mode} />
+        <EditModeButton modeChanged={mode => setMode(mode)} />
+      </Wrapper>
+    </DndProvider>
   );
 };
 
