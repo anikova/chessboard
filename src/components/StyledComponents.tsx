@@ -29,7 +29,6 @@ export const StyledButton = styled.button`
 
 export const ItemWrapper = styled.div<ItemWrapperProps>`
   cursor: ${({ isDisabled }) => (isDisabled ? 'not-allowed' : 'move')};
-  width: 2rem;
   height: 2rem;
   margin: 25%;
   ${({ hasValue, color, isDisabled }) =>
@@ -38,10 +37,11 @@ export const ItemWrapper = styled.div<ItemWrapperProps>`
       isDisabled ? 'gray' : color !== 'white' ? '#a8dadc' : '#e5989b'
     } !important`};
   color: ${({ color }) => `${color} !important`};
-  border-radius: 50%;
   text-align: center;
   padding-top: 10px;
   font-size: 20px;
+  transform: translateZ(0px);
+  border-radius: 50%;
 `;
 
 export const Header = styled.div`
